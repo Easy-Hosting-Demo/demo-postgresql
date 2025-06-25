@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: joh-test-db
+  name: joh-test-db
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: joh-test-db
+  type: ClusterIP
