@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: joh-test-db
+  name: joh-test-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: joh-test-db
+  template:
+    metadata:
+      labels:
+        app: joh-test-db
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_USER
+              name: database-secret-joh-test-db
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_PASSWORD
+              name: database-secret-joh-test-db
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              key: DB_NAME
+              name: database-secret-joh-test-db
+        image: postgres:15
+        name: joh-test-db
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: joh-test-db-storage
+      volumes:
+      - name: joh-test-db-storage
+        persistentVolumeClaim:
+          claimName: joh-test-db-pvc
