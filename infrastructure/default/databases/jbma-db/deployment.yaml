@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: jbma-db
+  name: jbma-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jbma-db
+  template:
+    metadata:
+      labels:
+        app: jbma-db
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_USER
+              name: database-secret-jbma-db
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_PASSWORD
+              name: database-secret-jbma-db
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              key: DB_NAME
+              name: database-secret-jbma-db
+        image: bitnami/postgresql:17.5.0
+        name: jbma-db
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - mountPath: /bitnami/postgresql
+          name: jbma-db-pvc
+      securityContext:
+        fsGroup: 1001
+        runAsNonRoot: true
+        runAsUser: 1001
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: jbma-db-pvc
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
