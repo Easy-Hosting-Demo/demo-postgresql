@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jbma-demo-cache
+  name: jbma-demo-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jbma-demo-cache
+  template:
+    metadata:
+      labels:
+        app: jbma-demo-cache
+    spec:
+      containers:
+      - args:
+        - --requirepass
+        - $(REDIS_PASSWORD)
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: CACHE_PASSWORD
+              name: cache-secret-jbma-demo-cache
+        image: redis:7
+        name: jbma-demo-cache
+        ports:
+        - containerPort: 6379
